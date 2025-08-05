@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Sensor Data Logger</title>
+    <title>Real-Time Sensor Data Logger</title>
     <style>
         * {
             margin: 0;
@@ -345,10 +345,9 @@
     <div class="container">
         <div class="header">
             <h1>💧 Flow Rate Monitoring</h1>
-            <p>Real-time Flow Rate and SD Card Management</p>
+            <p>Real-time Flow Rate and SD Card Management via WebSocket</p>
         </div>
 
-        <!-- Realtime Data Display -->
         <div class="realtime-section">
             <div class="realtime-title">📊 Real-Time Sensor Data</div>
             <div class="realtime-data">
@@ -363,7 +362,6 @@
             </div>
         </div>
 
-        <!-- Recording Controls Section -->
         <div class="controls">
             <div class="config-section">
                 <label for="modeSelect">1. Select Mode:</label>
@@ -371,14 +369,12 @@
                     <option value="records">Fixed Number of Records</option>
                     <option value="timer">Timer Mode</option>
                 </select>
-
                 <div id="recordsMode">
                     <label for="maxRecords">2. Max Records:</label>
                     <input type="number" id="maxRecords" min="1" max="1000" value="50">
                     <label for="recordInterval">3. Interval (seconds):</label>
                     <input type="number" id="recordInterval" min="1" max="60" value="1">
                 </div>
-
                 <div id="timerMode" style="display: none;">
                     <label for="maxDuration">2. Max Duration (seconds):</label>
                     <input type="number" id="maxDuration" min="1" max="3600" value="300">
@@ -386,11 +382,10 @@
                     <input type="number" id="timerInterval" min="1" max="60" value="1">
                 </div>
             </div>
-
             <div class="button-section">
                 <button id="startBtn" class="btn btn-start">🚀 Start Recording</button>
                 <button id="stopBtn" class="btn btn-stop" disabled>⏹️ Stop Recording</button>
-                <button id="exportBtn" class="btn btn-export" disabled>📥 Export CSV</button>
+                <button id="exportBtn" class="btn btn-export" disabled>📥 Export On-Screen Data</button>
                 <div class="recording-indicator" id="recordingIndicator">
                     <div class="pulse"></div>
                     <span>Recording...</span>
@@ -398,15 +393,12 @@
             </div>
         </div>
 
-        <div class="status" id="status">
-            Ready to start recording sensor data
-        </div>
+        <div class="status" id="status">Ready to start recording sensor data</div>
 
         <div class="progress-bar">
             <div class="progress-fill" id="progressFill"></div>
         </div>
 
-        <!-- Stats Section -->
         <div class="stats">
             <div class="stat-card">
                 <div class="stat-value" id="recordCount">0</div>
@@ -422,7 +414,6 @@
             </div>
         </div>
 
-        <!-- Data Table Section -->
         <div class="data-table">
             <table>
                 <thead>
@@ -431,18 +422,14 @@
                         <th>Flow Rate (L/min)</th>
                     </tr>
                 </thead>
-                <tbody id="dataTableBody">
-                </tbody>
+                <tbody id="dataTableBody"></tbody>
             </table>
         </div>
 
-        <!-- SD Card Management Section -->
         <div class="sd-card-section">
             <h2>🗂️ SD Card Management</h2>
             <div id="fileListContainer">
-                <ul id="fileList">
-                    <li>Loading...</li>
-                </ul>
+                <ul id="fileList"><li>Loading...</li></ul>
             </div>
             <div class="sd-controls">
                 <input type="text" id="fileNameInput" placeholder="Click file above or type name...">
@@ -460,41 +447,28 @@
                 this.recordingInterval = null;
                 this.durationTimer = null;
                 this.startTime = null;
-
                 this.maxRecords = 50;
                 this.recordInterval = 1;
                 this.maxDuration = 300;
                 this.timerInterval = 1;
                 this.currentRecord = 0;
                 this.elapsedTime = 0;
-                
                 this.currentFlowRate = 0;
-
                 this.initializeElements();
                 this.bindEvents();
             }
-
             initializeElements() {
-                // Control Buttons
                 this.startBtn = document.getElementById('startBtn');
                 this.stopBtn = document.getElementById('stopBtn');
                 this.exportBtn = document.getElementById('exportBtn');
-                
-                // Display Elements
                 this.status = document.getElementById('status');
                 this.recordingIndicator = document.getElementById('recordingIndicator');
                 this.progressFill = document.getElementById('progressFill');
                 this.dataTableBody = document.getElementById('dataTableBody');
-                
-                // Stats
                 this.recordCount = document.getElementById('recordCount');
                 this.avgFlowRate = document.getElementById('avgFlowRate');
                 this.duration = document.getElementById('duration');
-
-                // Realtime display
                 this.realtimeFlowRate = document.getElementById('realtimeFlowRate');
-
-                // Config inputs
                 this.maxRecordsInput = document.getElementById('maxRecords');
                 this.recordIntervalInput = document.getElementById('recordInterval');
                 this.maxDurationInput = document.getElementById('maxDuration');
@@ -503,63 +477,41 @@
                 this.recordsMode = document.getElementById('recordsMode');
                 this.timerMode = document.getElementById('timerMode');
             }
-
             bindEvents() {
                 this.startBtn.addEventListener('click', () => this.startRecording());
                 this.stopBtn.addEventListener('click', () => this.stopRecording());
                 this.exportBtn.addEventListener('click', () => this.exportToCSV());
-
                 this.modeSelect.addEventListener('change', (e) => {
-                    if (e.target.value === 'records') {
-                        this.recordsMode.style.display = 'block';
-                        this.timerMode.style.display = 'none';
-                    } else {
-                        this.recordsMode.style.display = 'none';
-                        this.timerMode.style.display = 'block';
-                    }
+                    this.recordsMode.style.display = e.target.value === 'records' ? 'block' : 'none';
+                    this.timerMode.style.display = e.target.value === 'timer' ? 'block' : 'none';
                 });
             }
-
             updateRealtimeDisplay(flowRate) {
                 this.realtimeFlowRate.classList.add('data-change');
                 this.realtimeFlowRate.textContent = flowRate.toFixed(1);
-                setTimeout(() => {
-                    this.realtimeFlowRate.classList.remove('data-change');
-                }, 500);
+                setTimeout(() => { this.realtimeFlowRate.classList.remove('data-change'); }, 500);
             }
-
-            getCurrentTime() {
-                return new Date().toLocaleTimeString();
-            }
-
+            getCurrentTime() { return new Date().toLocaleTimeString(); }
             startRecording() {
                 this.maxRecords = parseInt(this.maxRecordsInput.value);
                 this.recordInterval = parseFloat(this.recordIntervalInput.value);
                 this.maxDuration = parseInt(this.maxDurationInput.value);
                 this.timerInterval = parseFloat(this.timerIntervalInput.value);
-
                 this.data = [];
                 this.currentRecord = 0;
                 this.elapsedTime = 0;
                 this.isRecording = true;
                 this.startTime = Date.now();
-
                 this.startBtn.disabled = true;
                 this.stopBtn.disabled = false;
                 this.exportBtn.disabled = true;
-
                 const mode = this.modeSelect.value;
-                this.status.textContent = mode === 'records'
-                    ? `Recording... (Max: ${this.maxRecords} records, Interval: ${this.recordInterval}s)`
-                    : `Recording... (Max: ${this.maxDuration}s, Interval: ${this.timerInterval}s)`;
-                
+                this.status.textContent = mode === 'records' ? `Recording... (Max: ${this.maxRecords} records, Interval: ${this.recordInterval}s)` : `Recording... (Max: ${this.maxDuration}s, Interval: ${this.timerInterval}s)`;
                 this.status.className = 'status recording';
                 this.recordingIndicator.classList.add('active');
-
                 this.dataTableBody.innerHTML = '';
                 this.updateStats();
                 this.updateProgressDisplay();
-
                 if (mode === 'records') {
                     this.recordingInterval = setInterval(() => this.recordData(), this.recordInterval * 1000);
                 } else {
@@ -568,46 +520,33 @@
                         this.elapsedTime++;
                         this.updateStats();
                         this.updateProgressDisplay();
-                        if (this.elapsedTime >= this.maxDuration) {
-                            this.stopRecording('Maximum duration reached');
-                        }
+                        if (this.elapsedTime >= this.maxDuration) { this.stopRecording('Maximum duration reached'); }
                     }, 1000);
                 }
             }
-
             recordData() {
                 if (this.modeSelect.value === 'records' && this.currentRecord >= this.maxRecords) {
                     this.stopRecording('Maximum records reached');
                     return;
                 }
-
-                const record = {
-                    time: this.getCurrentTime(),
-                    flowRate: parseFloat(this.currentFlowRate.toFixed(2))
-                };
-
+                const record = { time: this.getCurrentTime(), flowRate: parseFloat(this.currentFlowRate.toFixed(2)) };
+                const logLine = `${record.time},${record.flowRate}`;
+                fetch('/write_log', { method: 'POST', headers: { 'Content-Type': 'text/plain' }, body: logLine }).catch(error => console.error('Failed to log data to server:', error));
                 this.data.push(record);
                 this.currentRecord++;
-
                 this.addTableRow(record);
                 this.updateStats();
                 this.updateProgressDisplay();
-
-                if (this.modeSelect.value === 'records') {
-                    this.elapsedTime = Math.floor((Date.now() - this.startTime) / 1000);
-                }
+                if (this.modeSelect.value === 'records') { this.elapsedTime = Math.floor((Date.now() - this.startTime) / 1000); }
             }
-
             addTableRow(record) {
                 const row = document.createElement('tr');
                 row.innerHTML = `<td>${record.time}</td><td>${record.flowRate.toFixed(2)}</td>`;
                 this.dataTableBody.insertBefore(row, this.dataTableBody.firstChild);
             }
-
             updateStats() {
                 const recordCountVal = this.data.length;
                 this.recordCount.textContent = recordCountVal;
-
                 if (recordCountVal > 0) {
                     const totalFlow = this.data.reduce((sum, record) => sum + record.flowRate, 0);
                     this.avgFlowRate.textContent = (totalFlow / recordCountVal).toFixed(2);
@@ -616,97 +555,73 @@
                 }
                 this.duration.textContent = this.elapsedTime;
             }
-
             updateProgressDisplay() {
                 const mode = this.modeSelect.value;
-                const progress = mode === 'records'
-                    ? (this.currentRecord / this.maxRecords) * 100
-                    : (this.elapsedTime / this.maxDuration) * 100;
+                const progress = mode === 'records' ? (this.currentRecord / this.maxRecords) * 100 : (this.elapsedTime / this.maxDuration) * 100;
                 this.progressFill.style.width = `${Math.min(progress, 100)}%`;
             }
-
             stopRecording(reason = 'Recording stopped manually') {
                 this.isRecording = false;
                 clearInterval(this.recordingInterval);
                 clearInterval(this.durationTimer);
                 this.recordingInterval = null;
                 this.durationTimer = null;
-
                 this.startBtn.disabled = false;
                 this.stopBtn.disabled = true;
                 this.exportBtn.disabled = this.data.length === 0;
-
                 this.status.textContent = `${reason}. ${this.data.length} records collected in ${this.elapsedTime}s.`;
                 this.status.className = 'status stopped';
                 this.recordingIndicator.classList.remove('active');
                 this.updateStats();
             }
-
             exportToCSV() {
-                if (this.data.length === 0) {
-                    alert('No data to export!');
-                    return;
-                }
-
+                if (this.data.length === 0) { alert('No on-screen data to export!'); return; }
                 const csvHeader = 'Time,Flow Rate (L/min)\n';
                 const csvData = this.data.map(r => `${r.time},${r.flowRate}`).join('\n');
                 const blob = new Blob([csvHeader + csvData], { type: 'text/csv' });
                 const url = window.URL.createObjectURL(blob);
                 const a = document.createElement('a');
                 a.href = url;
-                a.download = `flow_data_${new Date().toISOString().slice(0, 10)}.csv`;
+                a.download = `flow_data_snapshot_${new Date().toISOString().slice(0, 10)}.csv`;
                 a.click();
                 window.URL.revokeObjectURL(url);
-
-                this.status.textContent = 'Data exported successfully!';
+                this.status.textContent = 'On-screen data exported successfully!';
                 this.status.className = 'status';
             }
         }
 
         document.addEventListener('DOMContentLoaded', () => {
             const logger = new SensorDataLogger();
-
-            // --- Sensor Data Fetching ---
-            function getSensorData() {
-                fetch('/data')
-                    .then(response => {
-                        if (!response.ok) throw new Error('Network response was not ok');
-                        return response.json();
-                    })
-                    .then(data => {
-                        if (data.hasOwnProperty('flow_rate')) {
-                            logger.currentFlowRate = data.flow_rate;
-                            logger.updateRealtimeDisplay(data.flow_rate);
-                        }
-                    })
-                    .catch(error => {
-                        console.error('Error fetching sensor data:', error);
-                        logger.updateRealtimeDisplay(0); // Show 0 on error
-                        document.getElementById('realtimeFlowRate').textContent = 'Error';
-                    });
+            const gateway = `ws://${window.location.hostname}:81/`;
+            let websocket;
+            function initWebSocket() {
+                console.log('Trying to open a WebSocket connection...');
+                websocket = new WebSocket(gateway);
+                websocket.onopen = (event) => console.log('Connection opened');
+                websocket.onclose = (event) => { console.log('Connection closed'); setTimeout(initWebSocket, 2000); };
+                websocket.onmessage = (event) => {
+                    const flowRate = parseFloat(event.data);
+                    if (!isNaN(flowRate)) {
+                        logger.currentFlowRate = flowRate;
+                        logger.updateRealtimeDisplay(flowRate);
+                    }
+                };
             }
-            setInterval(getSensorData, 100); // Fetch every 2 seconds
-            getSensorData(); // Initial fetch
+            initWebSocket();
 
-            // --- SD Card Management Functions ---
             const fileListElem = document.getElementById('fileList');
             const fileNameInput = document.getElementById('fileNameInput');
-
             function listFiles() {
                 fetch('/list_files')
                     .then(response => {
-                        if (response.status === 503) { // Service Unavailable (SD not ready)
-                            fileListElem.innerHTML = '<li>SD Card not available.</li>';
-                            throw new Error('SD Card not available');
-                        }
+                        if (response.status === 503) { fileListElem.innerHTML = '<li>SD Card not available.</li>'; throw new Error('SD Card not available'); }
                         if (!response.ok) throw new Error('Failed to list files');
                         return response.json();
                     })
                     .then(files => {
                         fileListElem.innerHTML = '';
-                        if (files.length === 0) {
-                            fileListElem.innerHTML = '<li>No .csv files found.</li>';
-                        } else {
+                        if (files.length === 0) { fileListElem.innerHTML = '<li>No .csv files found.</li>'; } 
+                        else {
                             files.forEach(file => {
                                 const li = document.createElement('li');
                                 li.textContent = file;
@@ -717,39 +632,24 @@
                     })
                     .catch(error => {
                         console.error('Error listing files:', error.message);
-                        if (error.message !== 'SD Card not available') {
-                           fileListElem.innerHTML = '<li>Error loading file list.</li>';
-                        }
+                        if (error.message !== 'SD Card not available') { fileListElem.innerHTML = '<li>Error loading file list.</li>'; }
                     });
             }
-
             function deleteFile() {
                 const filename = fileNameInput.value;
                 if (!filename) { alert('Please select or enter a filename to delete.'); return; }
                 if (!confirm(`Are you sure you want to delete ${filename}?`)) return;
-
                 fetch(`/delete_file?filename=${filename}`)
-                    .then(response => {
-                        if (!response.ok) throw new Error('Server responded with an error.');
-                        alert('File deleted successfully');
-                        fileNameInput.value = '';
-                        listFiles();
-                    })
-                    .catch(error => {
-                        console.error('Error deleting file:', error);
-                        alert('Error deleting file. Check console for details.');
-                    });
+                    .then(response => { if (!response.ok) throw new Error('Server responded with an error.'); alert('File deleted successfully'); fileNameInput.value = ''; listFiles(); })
+                    .catch(error => { console.error('Error deleting file:', error); alert('Error deleting file.'); });
             }
-
             function downloadFile() {
                 const filename = fileNameInput.value;
                 if (!filename) { alert('Please select or enter a filename to download.'); return; }
                 window.location.href = `/download_file?filename=${filename}`;
             }
-
             document.getElementById('deleteFileBtn').addEventListener('click', deleteFile);
             document.getElementById('downloadFileBtn').addEventListener('click', downloadFile);
-
             listFiles();
         });
     </script>

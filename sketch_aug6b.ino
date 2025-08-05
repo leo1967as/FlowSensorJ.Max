@@ -4,195 +4,251 @@
 #include <SPIFFS.h>
 #include <WiFi.h>
 #include <WebServer.h>
+#include <WebSocketsServer.h> // ไลบรารีสำหรับ WebSocket
 #include <ArduinoJson.h>
 
+// --- Pin Definitions ---
 #define DE_RE_CTRL_PIN 4
 #define RX_PIN 16
 #define TX_PIN 17
+#define SD_CS_PIN 21
 
+// --- Modbus Settings ---
 #define SLAVE_ID 3
 #define REG_ADDRESS 20
 #define REG_COUNT 1
 
-ModbusMaster node;
-WebServer server(80);
+// --- Performance Tuning ---
+#define MODBUS_BAUD_RATE 19200      // ความเร็วในการสื่อสาร Modbus (ตรวจสอบว่า Slave รองรับ)
+#define DATA_READ_INTERVAL_MS 50     // อ่านค่าจาก Modbus ทุกๆ 50ms (20 ครั้งต่อวินาที)
 
-void preTransmission();
-void postTransmission();
+// --- Global Objects ---
+WebServer server(80);                     // WebServer สำหรับ HTTP ที่พอร์ต 80
+WebSocketsServer webSocket = WebSocketsServer(81); // WebSocket Server ที่พอร์ต 81
+
+ModbusMaster node;
+
+// --- Global State Flags & Timers ---
+bool sdCardInitialized = false;
+unsigned long lastReadTime = 0;
+uint16_t currentFlowRate = 0; // เก็บค่าล่าสุด
+
+// --- SD Card Data Buffering ---
+String dataBuffer = "";
+int bufferCount = 0;
+#define DATA_BUFFER_SIZE 50      // จำนวนข้อมูลที่จะเก็บใน RAM ก่อนเขียนลง SD Card
+#define FLUSH_INTERVAL_MS 5000   // หรือเขียนลงการ์ดทุกๆ 5 วินาที
+unsigned long lastFlushTime = 0;
+
+
+// --- Function Prototypes ---
+void webSocketEvent(uint8_t num, WStype_t type, uint8_t * payload, size_t length);
+void flushBufferToSD();
+String listFiles();
+void deleteFile(String path);
+void downloadFile(String path);
+
 
 void setup() {
   Serial.begin(115200);
-  Serial2.begin(19200, SERIAL_8N1, RX_PIN, TX_PIN);
+  
+  // --- Modbus Initialization ---
+  Serial2.begin(MODBUS_BAUD_RATE, SERIAL_8N1, RX_PIN, TX_PIN);
   pinMode(DE_RE_CTRL_PIN, OUTPUT);
   digitalWrite(DE_RE_CTRL_PIN, LOW);
-  node.preTransmission(preTransmission);
-  node.postTransmission(postTransmission);
+  node.preTransmission([](){ digitalWrite(DE_RE_CTRL_PIN, HIGH); });
+  node.postTransmission([](){ digitalWrite(DE_RE_CTRL_PIN, LOW); });
   node.begin(SLAVE_ID, Serial2);
   Serial.println("ESP32 Modbus RTU Master Ready");
 
-  if (!SPIFFS.begin()) {
-    Serial.println("SPIFFS Mount Failed");
-    return;
+  // --- SPIFFS & SD Card Initialization ---
+  if (!SPIFFS.begin(true)) { 
+    Serial.println("SPIFFS Mount Failed"); 
+    return; 
+  }
+  Serial.println("SPIFFS Ready");
+  
+  if (SD.begin(SD_CS_PIN)) {
+    sdCardInitialized = true;
+    dataBuffer.reserve(2048); // จองหน่วยความจำสำหรับ Buffer ล่วงหน้า
+    Serial.println("SD Card Ready");
+  } else {
+    Serial.println("SD Card Mount Failed. Continuing without SD card functionality.");
   }
 
-  // SD Card Initialization
-  const int chipSelect = 15;
-  if (!SD.begin(chipSelect)) {
-    Serial.println("SD Card Mount Failed");
-  }
-  Serial.println("SD Card Ready");
+  // --- WiFi Access Point Setup ---
+  WiFi.softAP("ESP32-AP", "12345678");
+  Serial.print("AP IP address: "); 
+  Serial.println(WiFi.softAPIP());
 
-  // --- Start: WiFi Access Point Setup ---
-  const char* ssid = "ESP32-AP"; // ชื่อ WiFi ที่จะให้ ESP32 สร้างขึ้น
-  const char* password = "12345678"; // รหัสผ่านสำหรับ WiFi (อย่างน้อย 8 ตัวอักษร)
-
-  // Start Access Point
-  WiFi.softAP(ssid, password);
-  Serial.println("Access Point Started");
-  Serial.print("IP address: ");
-  Serial.println(WiFi.softAPIP()); // แสดง IP Address ของ ESP32 AP
-  // --- End: WiFi Access Point Setup ---
-
+  // --- Web Server (HTTP) Endpoints ---
   server.on("/", HTTP_GET, [&]() {
     File file = SPIFFS.open("/main.html", "r");
-    if (!file) {
-      Serial.println("Failed to open main.html");
-      server.send(404, "text/plain", "File not found");
-      return;
-    }
-    server.streamFile(file, "text/html");
-    file.close();
-  });
-  server.on("/data", HTTP_GET, [&]() {
-    uint8_t result = node.readHoldingRegisters(REG_ADDRESS, REG_COUNT);
-    if (result == node.ku8MBSuccess) {
-      uint16_t sensorValue = node.getResponseBuffer(0);
-      JsonDocument doc;
-      doc["flow_rate"] = sensorValue;
-      String jsonString;
-      serializeJson(doc, jsonString);
-      server.send(200, "application/json", jsonString);
+    if (file) {
+      server.streamFile(file, "text/html");
+      file.close();
     } else {
-      server.send(500, "text/plain", "Failed to read sensor data");
+      server.send(404, "text/plain", "main.html not found");
     }
   });
 
   server.on("/list_files", HTTP_GET, [&]() {
-    String fileList = listFiles();
-    server.send(200, "application/json", fileList);
+    if (!sdCardInitialized) { server.send(503, "text/plain", "SD Card not available"); return; }
+    flushBufferToSD(); // เขียนข้อมูลที่ค้างอยู่ลงการ์ดก่อนแสดงรายการ
+    server.send(200, "application/json", listFiles());
   });
 
   server.on("/delete_file", HTTP_GET, [&]() {
-    String filename = server.arg("filename");
-    if (filename.length() > 0) {
-      deleteFile(filename);
-      server.send(200, "text/plain", "File deleted");
+    if (!sdCardInitialized) { server.send(503, "text/plain", "SD Card not available"); return; }
+    if (server.hasArg("filename")) {
+      deleteFile(server.arg("filename"));
+      server.send(200, "text/plain", "File deletion command sent.");
     } else {
       server.send(400, "text/plain", "Filename not provided");
     }
   });
 
   server.on("/download_file", HTTP_GET, [&]() {
-    String filename = server.arg("filename");
-    if (filename.length() > 0) {
-      downloadFile(filename);
+    if (!sdCardInitialized) { server.send(503, "text/plain", "SD Card not available"); return; }
+    flushBufferToSD(); // เขียนข้อมูลที่ค้างอยู่ลงการ์ดก่อนดาวน์โหลด
+    if (server.hasArg("filename")) {
+      downloadFile(server.arg("filename"));
     } else {
       server.send(400, "text/plain", "Filename not provided");
     }
   });
 
-  server.on("/write_file", HTTP_POST, [&]() {
-    String filename = server.arg("filename");
-    String content = server.arg("plain");
-    if (filename.length() > 0 && content.length() > 0) {
-      writeFile(filename, content);
-      server.send(200, "text/plain", "File written successfully");
+  // Endpoint สำหรับรับ Log จากหน้าเว็บเพื่อมาเก็บใน Buffer
+  server.on("/write_log", HTTP_POST, [&]() {
+    if (!sdCardInitialized) { server.send(503, "text/plain", "SD Card not available"); return; }
+    if (server.hasArg("plain")) {
+      dataBuffer += server.arg("plain") + "\n";
+      bufferCount++;
+      if (bufferCount >= DATA_BUFFER_SIZE) { 
+        flushBufferToSD(); 
+      }
+      server.send(200, "text/plain", "Log received");
     } else {
-      server.send(400, "text/plain", "Filename or content not provided");
+      server.send(400, "text/plain", "No data provided");
     }
   });
-
+  
   server.begin();
-  Serial.println("Web server started");
+  Serial.println("HTTP server started");
+
+  // --- WebSocket Server Initialization ---
+  webSocket.begin();
+  webSocket.onEvent(webSocketEvent);
+  Serial.println("WebSocket server started on port 81");
+  lastFlushTime = millis();
 }
 
 void loop() {
-  server.handleClient();
-  delay(1000);
-}
+  webSocket.loop();      // จัดการการเชื่อมต่อ WebSocket
+  server.handleClient(); // จัดการการเชื่อมต่อ HTTP
 
-void preTransmission() {
-  digitalWrite(DE_RE_CTRL_PIN, HIGH);
-}
-
-void postTransmission() {
-  digitalWrite(DE_RE_CTRL_PIN, LOW);
-}
-
-String readFile(String path) {
-  Serial.printf("Reading file: %s\r\n", path.c_str());
-
-  File file = SD.open(path.c_str());
-  if (!file || file.isDirectory()) {
-    Serial.println("- failed to open file for reading");
-    return String();
+  // --- Non-blocking Modbus Read and WebSocket Push ---
+  if (millis() - lastReadTime > DATA_READ_INTERVAL_MS) {
+    lastReadTime = millis();
+    uint8_t result = node.readHoldingRegisters(REG_ADDRESS, REG_COUNT);
+    if (result == node.ku8MBSuccess) {
+      uint16_t newFlowRate = node.getResponseBuffer(0);
+      if (newFlowRate != currentFlowRate) {
+        currentFlowRate = newFlowRate;
+        
+        // --- จุดที่แก้ไข 1 ---
+        // สร้างตัวแปร String ขึ้นมาก่อน
+        String payload = String(currentFlowRate);
+        // แล้วค่อยส่งตัวแปรนั้นเข้าไป
+        webSocket.broadcastTXT(payload);
+      }
+    }
   }
 
-  String fileContent;
-  while (file.available()) {
-    fileContent += String(file.readStringUntil('\n'));
+  // --- Non-blocking SD Card Buffer Flush ---
+  if (sdCardInitialized && bufferCount > 0 && (millis() - lastFlushTime > FLUSH_INTERVAL_MS)) {
+      flushBufferToSD();
   }
-  Serial.println("- read from file: " + path);
-  file.close();
-  return fileContent;
+
+  delay(2); // ให้เวลา Task อื่นๆ ของ ESP32 ทำงาน (สำคัญมาก)
 }
 
-void writeFile(String path, String content) {
-  Serial.printf("Writing file: %s\r\n", path.c_str());
+// --- ฟังก์ชันจัดการ Event ของ WebSocket ---
+void webSocketEvent(uint8_t num, WStype_t type, uint8_t * payload, size_t length) {
+  switch(type) {
+    case WStype_DISCONNECTED:
+      Serial.printf("[%u] Disconnected!\n", num);
+      break;
+    case WStype_CONNECTED: {
+      IPAddress ip = webSocket.remoteIP(num);
+      Serial.printf("[%u] Connected from %s\n", num, ip.toString().c_str());
 
-  File file = SD.open(path.c_str(), FILE_WRITE);
-  if (!file) {
-    Serial.println("- failed to open file for writing");
-    return;
+      // --- จุดที่แก้ไข 2 ---
+      // สร้างตัวแปร String ขึ้นมาก่อน
+      String payload = String(currentFlowRate);
+      // แล้วค่อยส่งตัวแปรนั้นเข้าไป
+      webSocket.sendTXT(num, payload);
+      break;
+    }
+    case WStype_TEXT:
+      Serial.printf("[%u] get Text: %s\n", num, payload);
+      break;
+    case WStype_BIN:
+    case WStype_ERROR:
+    case WStype_FRAGMENT_TEXT_START:
+    case WStype_FRAGMENT_BIN_START:
+    case WStype_FRAGMENT:
+    case WStype_FRAGMENT_FIN:
+      break;
   }
-  if (file.print(content)) {
-    Serial.println("- wrote to file: " + path);
-  } else {
-    Serial.println("- write failed");
-  }
-  file.close();
+}
+
+// --- ฟังก์ชันจัดการไฟล์บน SD Card (เหมือนเดิม) ---
+void flushBufferToSD() {
+    if (bufferCount == 0 || !sdCardInitialized) {
+        return;
+    }
+    Serial.printf("Flushing %d records to SD card...\n", bufferCount);
+    File dataFile = SD.open("/datalog.csv", FILE_APPEND);
+    if (dataFile) {
+        dataFile.print(dataBuffer);
+        dataFile.close();
+        Serial.println("Flush successful.");
+    } else {
+        Serial.println("Failed to open datalog.csv for appending.");
+    }
+    dataBuffer = "";
+    bufferCount = 0;
+    lastFlushTime = millis();
 }
 
 String listFiles() {
   String fileList = "[";
   File root = SD.open("/");
   if (!root) {
-    Serial.println("Failed to open directory");
     return "[]";
   }
-
   File file = root.openNextFile();
+  bool firstFile = true;
   while (file) {
-    if (file.isDirectory()) {
-      Serial.println("  DIR : " + String(file.name()));
-    } else {
-      String fileName = String(file.name());
-      if (fileName.endsWith(".csv")) {
-        Serial.println("  FILE: " + fileName);
-        fileList += "\"" + fileName + "\",";
+    if (!file.isDirectory() && String(file.name()).endsWith(".csv")) {
+      if (!firstFile) {
+        fileList += ",";
       }
+      fileList += "\"" + String(file.name()) + "\"";
+      firstFile = false;
     }
+    file.close();
     file = root.openNextFile();
   }
-  if (fileList.length() > 1) {
-    fileList.remove(fileList.length() - 1);
-  }
+  root.close();
   fileList += "]";
   return fileList;
 }
 
 void deleteFile(String path) {
-  Serial.printf("Deleting file: %s\r\n", path.c_str());
+  if (!sdCardInitialized || path.length() == 0) return;
+  Serial.printf("Deleting file: %s\n", path.c_str());
   if (SD.remove(path.c_str())) {
     Serial.println("- file deleted");
   } else {
@@ -201,14 +257,13 @@ void deleteFile(String path) {
 }
 
 void downloadFile(String path) {
-  Serial.printf("Downloading file: %s\r\n", path.c_str());
-
-  File file = SD.open(path.c_str());
+  if (!sdCardInitialized || path.length() == 0) return;
+  File file = SD.open(path.c_str(), "r");
   if (!file) {
-    Serial.println("- failed to open file for reading");
+    server.send(404, "text/plain", "File not found on SD card");
     return;
   }
-
+  server.sendHeader("Content-Disposition", "attachment; filename=" + path);
   server.streamFile(file, "application/octet-stream");
   file.close();
 }
