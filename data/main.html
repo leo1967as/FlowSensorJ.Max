@@ -10,14 +10,12 @@
             padding: 0;
             box-sizing: border-box;
         }
-
         body {
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             min-height: 100vh;
             padding: 20px;
         }
-
         .container {
             max-width: 1200px;
             margin: 0 auto;
@@ -26,32 +24,26 @@
             box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
             overflow: hidden;
         }
-
         .header {
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             color: white;
             padding: 30px;
             text-align: center;
         }
-
         .header h1 {
             font-size: 2.5em;
             margin-bottom: 10px;
             text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
         }
-
         .header p {
             font-size: 1.2em;
             opacity: 0.9;
         }
-
-        /* Realtime Display Section */
         .realtime-section {
             padding: 30px;
             background: #f8f9fa;
             border-bottom: 1px solid #e0e0e0;
         }
-
         .realtime-title {
             text-align: center;
             font-size: 1.5em;
@@ -59,14 +51,13 @@
             margin-bottom: 20px;
             font-weight: bold;
         }
-
         .realtime-data {
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
             gap: 20px;
             margin-bottom: 20px;
+            justify-content: center;
         }
-
         .realtime-card {
             background: white;
             padding: 25px;
@@ -76,46 +67,31 @@
             transition: transform 0.3s ease;
             border: 3px solid transparent;
         }
-
         .realtime-card:hover {
             transform: translateY(-5px);
         }
-
         .realtime-card.flowrate {
             border-color: #4CAF50;
         }
-
-        .realtime-card.temperature {
-            border-color: #FF9800;
-        }
-
         .realtime-value {
             font-size: 2.5em;
             font-weight: bold;
             margin-bottom: 10px;
             transition: all 0.3s ease;
         }
-
         .realtime-card.flowrate .realtime-value {
             color: #4CAF50;
         }
-
-        .realtime-card.temperature .realtime-value {
-            color: #FF9800;
-        }
-
         .realtime-label {
             color: #666;
             font-size: 1.1em;
             text-transform: uppercase;
             letter-spacing: 1px;
         }
-
         .realtime-unit {
             font-size: 0.7em;
             color: #999;
         }
-
         .live-indicator {
             display: flex;
             justify-content: center;
@@ -123,7 +99,6 @@
             gap: 10px;
             margin-top: 20px;
         }
-
         .live-dot {
             width: 12px;
             height: 12px;
@@ -131,14 +106,12 @@
             border-radius: 50%;
             animation: pulse 1.5s infinite;
         }
-
         .live-text {
             color: #4CAF50;
             font-weight: bold;
             text-transform: uppercase;
             letter-spacing: 1px;
         }
-
         .controls {
             padding: 30px;
             background: #f8f9fa;
@@ -148,7 +121,6 @@
             align-items: center;
             flex-wrap: wrap;
         }
-
         .config-section {
             display: flex;
             flex-direction: column;
@@ -159,13 +131,11 @@
             box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
             min-width: 250px;
         }
-
         .config-section label {
             font-weight: bold;
             color: #333;
             margin-bottom: 5px;
         }
-
         .config-section input, .config-section select {
             padding: 10px;
             border: 2px solid #ddd;
@@ -173,20 +143,17 @@
             font-size: 1em;
             transition: border-color 0.3s ease;
         }
-
         .config-section input:focus, .config-section select:focus {
             outline: none;
             border-color: #667eea;
             box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
         }
-
         .button-section {
             display: flex;
             gap: 20px;
             align-items: center;
             flex-wrap: wrap;
         }
-
         .btn {
             padding: 15px 30px;
             border: none;
@@ -199,37 +166,22 @@
             letter-spacing: 1px;
             box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
         }
-
         .btn:hover {
             transform: translateY(-2px);
             box-shadow: 0 8px 25px rgba(0, 0, 0, 0.3);
         }
-
-        .btn:active {
-            transform: translateY(0);
-        }
-
         .btn-start {
-            background: linear-gradient(135deg, #4CAF50, #45a049);
-            color: white;
+            background: linear-gradient(135deg, #4CAF50, #45a049); color: white;
         }
-
         .btn-stop {
-            background: linear-gradient(135deg, #f44336, #da190b);
-            color: white;
+            background: linear-gradient(135deg, #f44336, #da190b); color: white;
         }
-
         .btn-export {
-            background: linear-gradient(135deg, #2196F3, #1976D2);
-            color: white;
+            background: linear-gradient(135deg, #2196F3, #1976D2); color: white;
         }
-
         .btn:disabled {
-            opacity: 0.5;
-            cursor: not-allowed;
-            transform: none;
+            opacity: 0.5; cursor: not-allowed; transform: none;
         }
-
         .status {
             padding: 20px 30px;
             background: #e8f5e8;
@@ -239,19 +191,12 @@
             font-weight: bold;
             text-align: center;
         }
-
         .status.recording {
-            background: #fff3cd;
-            border-color: #ffc107;
-            color: #856404;
+            background: #fff3cd; border-color: #ffc107; color: #856404;
         }
-
         .status.stopped {
-            background: #f8d7da;
-            border-color: #dc3545;
-            color: #721c24;
+            background: #f8d7da; border-color: #dc3545; color: #721c24;
         }
-
         .stats {
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
@@ -259,40 +204,25 @@
             padding: 30px;
             background: #f8f9fa;
         }
-
         .stat-card {
             background: white;
             padding: 20px;
             border-radius: 15px;
             text-align: center;
             box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
-            transition: transform 0.3s ease;
         }
-
-        .stat-card:hover {
-            transform: translateY(-5px);
-        }
-
         .stat-value {
             font-size: 2em;
             font-weight: bold;
             color: #667eea;
             margin-bottom: 5px;
         }
-
         .stat-label {
-            color: #666;
-            font-size: 0.9em;
-            text-transform: uppercase;
-            letter-spacing: 1px;
+            color: #666; font-size: 0.9em; text-transform: uppercase; letter-spacing: 1px;
         }
-
         .data-table {
-            padding: 30px;
-            max-height: 400px;
-            overflow-y: auto;
+            padding: 30px; max-height: 400px; overflow-y: auto;
         }
-
         table {
             width: 100%;
             border-collapse: collapse;
@@ -301,13 +231,9 @@
             overflow: hidden;
             box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
         }
-
         th, td {
-            padding: 15px;
-            text-align: left;
-            border-bottom: 1px solid #ddd;
+            padding: 15px; text-align: left; border-bottom: 1px solid #ddd;
         }
-
         th {
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             color: white;
@@ -315,11 +241,9 @@
             text-transform: uppercase;
             letter-spacing: 1px;
         }
-
         tr:hover {
             background: #f5f5f5;
         }
-
         .progress-bar {
             margin: 20px 30px;
             background: #e0e0e0;
@@ -327,69 +251,93 @@
             height: 8px;
             overflow: hidden;
         }
-
         .progress-fill {
             height: 100%;
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             width: 0%;
             transition: width 0.3s ease;
         }
-
         .recording-indicator {
-            display: none;
-            align-items: center;
-            gap: 10px;
-            color: #dc3545;
-            font-weight: bold;
+            display: none; align-items: center; gap: 10px; color: #dc3545; font-weight: bold;
         }
-
         .recording-indicator.active {
             display: flex;
         }
-
         .pulse {
-            width: 12px;
-            height: 12px;
-            background: #dc3545;
-            border-radius: 50%;
-            animation: pulse 1s infinite;
+            width: 12px; height: 12px; background: #dc3545; border-radius: 50%; animation: pulse 1s infinite;
         }
-
         @keyframes pulse {
             0% { opacity: 1; transform: scale(1); }
             50% { opacity: 0.3; transform: scale(1.1); }
             100% { opacity: 1; transform: scale(1); }
         }
-
         .data-change {
             animation: dataUpdate 0.5s ease-out;
         }
-
         @keyframes dataUpdate {
             0% { transform: scale(1); }
             50% { transform: scale(1.05); }
             100% { transform: scale(1); }
         }
+        .sd-card-section {
+            padding: 30px;
+            background: #f8f9fa;
+            border-top: 1px solid #e0e0e0;
+        }
+        .sd-card-section h2 {
+            font-size: 1.5em; color: #333; margin-bottom: 15px; text-align: center;
+        }
+        #fileListContainer {
+            max-height: 150px;
+            overflow-y: auto;
+            border: 1px solid #ddd;
+            padding: 10px;
+            border-radius: 8px;
+            background: #fff;
+            margin-bottom: 15px;
+        }
+        .sd-card-section ul {
+            list-style: none; padding: 0; margin: 0;
+        }
+        .sd-card-section li {
+            padding: 8px 12px; border-bottom: 1px solid #eee; cursor: pointer;
+        }
+        .sd-card-section li:last-child {
+            border-bottom: none;
+        }
+        .sd-card-section li:hover {
+            background-color: #f0f0f0;
+        }
+        .sd-controls {
+            display: flex;
+            gap: 10px;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+        .sd-controls input[type="text"] {
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            flex-grow: 1;
+        }
+        .btn-sd {
+            padding: 10px 15px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            background-color: #6c757d;
+            color: white;
+            transition: background-color 0.3s;
+        }
+        .btn-sd:hover {
+            background-color: #5a6268;
+        }
 
         @media (max-width: 768px) {
-            .controls {
-                flex-direction: column;
-            }
-            
-            .config-section {
-                width: 100%;
-                max-width: 300px;
-            }
-            
-            .button-section {
-                flex-direction: column;
-                width: 100%;
-            }
-            
-            .btn {
-                width: 100%;
-                max-width: 300px;
-            }
+            .controls { flex-direction: column; }
+            .config-section { width: 100%; max-width: 300px; }
+            .button-section { flex-direction: column; width: 100%; }
+            .btn { width: 100%; max-width: 300px; }
         }
     </style>
 </head>
@@ -415,18 +363,7 @@
             </div>
         </div>
 
-        <!-- SD Card Management Section -->
-        <div class="sd-card-section">
-            <h2>SD Card Management</h2>
-            <ul id="fileList">
-                <li>Loading...</li>
-            </ul>
-            <input type="text" id="filenameToDelete" placeholder="Filename to delete">
-            <button id="deleteFileBtn">Delete File</button>
-            <input type="text" id="filenameToDownload" placeholder="Filename to download">
-            <button id="downloadFileBtn">Download File</button>
-        </div>
-
+        <!-- Recording Controls Section -->
         <div class="controls">
             <div class="config-section">
                 <label for="modeSelect">1. Select Mode:</label>
@@ -435,20 +372,18 @@
                     <option value="timer">Timer Mode</option>
                 </select>
 
-                <!-- Fixed Records Mode Controls -->
                 <div id="recordsMode">
                     <label for="maxRecords">2. Max Records:</label>
                     <input type="number" id="maxRecords" min="1" max="1000" value="50">
                     <label for="recordInterval">3. Interval (seconds):</label>
-                    <input type="number" id="recordInterval" min="0.1" max="60" step="0.1" value="1">
+                    <input type="number" id="recordInterval" min="1" max="60" value="1">
                 </div>
 
-                <!-- Timer Mode Controls -->
                 <div id="timerMode" style="display: none;">
                     <label for="maxDuration">2. Max Duration (seconds):</label>
                     <input type="number" id="maxDuration" min="1" max="3600" value="300">
                     <label for="timerInterval">3. Interval (seconds):</label>
-                    <input type="number" id="timerInterval" min="0.1" max="60" step="0.1" value="1">
+                    <input type="number" id="timerInterval" min="1" max="60" value="1">
                 </div>
             </div>
 
@@ -471,6 +406,7 @@
             <div class="progress-fill" id="progressFill"></div>
         </div>
 
+        <!-- Stats Section -->
         <div class="stats">
             <div class="stat-card">
                 <div class="stat-value" id="recordCount">0</div>
@@ -481,27 +417,38 @@
                 <div class="stat-label">Avg Flow Rate (L/min)</div>
             </div>
             <div class="stat-card">
-                <div class="stat-value" id="avgTemp">0.0</div>
-                <div class="stat-label">Avg Temperature (°C)</div>
-            </div>
-            <div class="stat-card">
                 <div class="stat-value" id="duration">0</div>
                 <div class="stat-label">Duration (s)</div>
             </div>
         </div>
 
+        <!-- Data Table Section -->
         <div class="data-table">
-            <table id="dataTable">
+            <table>
                 <thead>
                     <tr>
                         <th>Time</th>
                         <th>Flow Rate (L/min)</th>
-                        <th>Temperature (°C)</th>
                     </tr>
                 </thead>
                 <tbody id="dataTableBody">
                 </tbody>
             </table>
+        </div>
+
+        <!-- SD Card Management Section -->
+        <div class="sd-card-section">
+            <h2>🗂️ SD Card Management</h2>
+            <div id="fileListContainer">
+                <ul id="fileList">
+                    <li>Loading...</li>
+                </ul>
+            </div>
+            <div class="sd-controls">
+                <input type="text" id="fileNameInput" placeholder="Click file above or type name...">
+                <button id="downloadFileBtn" class="btn-sd">Download</button>
+                <button id="deleteFileBtn" class="btn-sd">Delete</button>
+            </div>
         </div>
     </div>
 
@@ -512,45 +459,40 @@
                 this.isRecording = false;
                 this.recordingInterval = null;
                 this.durationTimer = null;
-                this.realtimeInterval = null;
                 this.startTime = null;
+
                 this.maxRecords = 50;
-                this.recordInterval = 1; // seconds
-                this.maxDuration = 300; // seconds (5 minutes default)
-                this.timerInterval = 1; // seconds for timer mode
+                this.recordInterval = 1;
+                this.maxDuration = 300;
+                this.timerInterval = 1;
                 this.currentRecord = 0;
                 this.elapsedTime = 0;
                 
-                // Current realtime sensor values
                 this.currentFlowRate = 0;
-                this.currentTemperature = 0;
-                
-                // Flow rate and temperature ranges for realistic simulation
-                this.flowRateBase = 7.5; // Base flow rate
-                this.temperatureBase = 26.5; // Base temperature
-                this.flowRateVariation = 0.2; // Variation range
-                this.temperatureVariation = 0.3; // Variation range
 
-                
-                                this.initializeElements();
-                                this.bindEvents();
-                            }
+                this.initializeElements();
+                this.bindEvents();
+            }
+
             initializeElements() {
+                // Control Buttons
                 this.startBtn = document.getElementById('startBtn');
                 this.stopBtn = document.getElementById('stopBtn');
                 this.exportBtn = document.getElementById('exportBtn');
+                
+                // Display Elements
                 this.status = document.getElementById('status');
                 this.recordingIndicator = document.getElementById('recordingIndicator');
                 this.progressFill = document.getElementById('progressFill');
                 this.dataTableBody = document.getElementById('dataTableBody');
+                
+                // Stats
                 this.recordCount = document.getElementById('recordCount');
                 this.avgFlowRate = document.getElementById('avgFlowRate');
-                this.avgTemp = document.getElementById('avgTemp');
                 this.duration = document.getElementById('duration');
 
-                // Realtime display elements
+                // Realtime display
                 this.realtimeFlowRate = document.getElementById('realtimeFlowRate');
-                this.realtimeTemp = document.getElementById('realtimeTemp');
 
                 // Config inputs
                 this.maxRecordsInput = document.getElementById('maxRecords');
@@ -567,7 +509,6 @@
                 this.stopBtn.addEventListener('click', () => this.stopRecording());
                 this.exportBtn.addEventListener('click', () => this.exportToCSV());
 
-                // Switch between modes
                 this.modeSelect.addEventListener('change', (e) => {
                     if (e.target.value === 'records') {
                         this.recordsMode.style.display = 'block';
@@ -579,19 +520,16 @@
                 });
             }
 
-            updateRealtimeDisplay(temperature) {
-                // Add animation effect
-                this.realtimeTemp.classList.add('data-change');
-                this.realtimeTemp.textContent = temperature.toFixed(1);
-
+            updateRealtimeDisplay(flowRate) {
+                this.realtimeFlowRate.classList.add('data-change');
+                this.realtimeFlowRate.textContent = flowRate.toFixed(1);
                 setTimeout(() => {
-                    this.realtimeTemp.classList.remove('data-change');
+                    this.realtimeFlowRate.classList.remove('data-change');
                 }, 500);
             }
 
             getCurrentTime() {
-                const now = new Date();
-                return now.toLocaleTimeString();
+                return new Date().toLocaleTimeString();
             }
 
             startRecording() {
@@ -611,11 +549,9 @@
                 this.exportBtn.disabled = true;
 
                 const mode = this.modeSelect.value;
-                if (mode === 'records') {
-                    this.status.textContent = `Recording sensor data... (Max: ${this.maxRecords} records, Interval: ${this.recordInterval}s)`;
-                } else {
-                    this.status.textContent = `Recording sensor data... (Max: ${this.maxDuration}s, Interval: ${this.timerInterval}s)`;
-                }
+                this.status.textContent = mode === 'records'
+                    ? `Recording... (Max: ${this.maxRecords} records, Interval: ${this.recordInterval}s)`
+                    : `Recording... (Max: ${this.maxDuration}s, Interval: ${this.timerInterval}s)`;
                 
                 this.status.className = 'status recording';
                 this.recordingIndicator.classList.add('active');
@@ -624,22 +560,14 @@
                 this.updateStats();
                 this.updateProgressDisplay();
 
-                // Start recording based on the selected mode
                 if (mode === 'records') {
-                    this.recordingInterval = setInterval(() => {
-                        this.recordData();
-                    }, this.recordInterval * 1000);
+                    this.recordingInterval = setInterval(() => this.recordData(), this.recordInterval * 1000);
                 } else {
-                    // Timer mode with custom interval
-                    this.recordingInterval = setInterval(() => {
-                        this.recordData();
-                    }, this.timerInterval * 1000);
-                    
+                    this.recordingInterval = setInterval(() => this.recordData(), this.timerInterval * 1000);
                     this.durationTimer = setInterval(() => {
                         this.elapsedTime++;
                         this.updateStats();
                         this.updateProgressDisplay();
-
                         if (this.elapsedTime >= this.maxDuration) {
                             this.stopRecording('Maximum duration reached');
                         }
@@ -653,15 +581,9 @@
                     return;
                 }
 
-                const time = this.getCurrentTime();
-                // Use current realtime values for recording
-                const flowRate = parseFloat(this.currentFlowRate.toFixed(2));
-                const temperature = parseFloat(this.currentTemperature.toFixed(1));
-
                 const record = {
-                    time: time,
-                    flowRate: flowRate,
-                    temperature: temperature
+                    time: this.getCurrentTime(),
+                    flowRate: parseFloat(this.currentFlowRate.toFixed(2))
                 };
 
                 this.data.push(record);
@@ -671,7 +593,6 @@
                 this.updateStats();
                 this.updateProgressDisplay();
 
-                // Update elapsed time for records mode
                 if (this.modeSelect.value === 'records') {
                     this.elapsedTime = Math.floor((Date.now() - this.startTime) / 1000);
                 }
@@ -679,66 +600,45 @@
 
             addTableRow(record) {
                 const row = document.createElement('tr');
-                row.innerHTML = `
-                    <td>${record.time}</td>
-                    <td>${record.flowRate}</td>
-                    <td>${record.temperature}</td>
-                `;
+                row.innerHTML = `<td>${record.time}</td><td>${record.flowRate.toFixed(2)}</td>`;
                 this.dataTableBody.insertBefore(row, this.dataTableBody.firstChild);
             }
 
             updateStats() {
-                const recordCount = this.data.length;
-                this.recordCount.textContent = recordCount;
+                const recordCountVal = this.data.length;
+                this.recordCount.textContent = recordCountVal;
 
-                if (recordCount > 0) {
-                    const avgFlowRate = this.data.reduce((sum, record) => sum + record.flowRate, 0) / recordCount;
-                    const avgTemp = this.data.reduce((sum, record) => sum + record.temperature, 0) / recordCount;
-
-                    this.avgFlowRate.textContent = avgFlowRate.toFixed(2);
-                    this.avgTemp.textContent = avgTemp.toFixed(1);
+                if (recordCountVal > 0) {
+                    const totalFlow = this.data.reduce((sum, record) => sum + record.flowRate, 0);
+                    this.avgFlowRate.textContent = (totalFlow / recordCountVal).toFixed(2);
                 } else {
                     this.avgFlowRate.textContent = '0.0';
-                    this.avgTemp.textContent = '0.0';
                 }
-
                 this.duration.textContent = this.elapsedTime;
             }
 
             updateProgressDisplay() {
                 const mode = this.modeSelect.value;
-                let progress = 0;
-
-                if (mode === 'records') {
-                    progress = (this.currentRecord / this.maxRecords) * 100;
-                } else {
-                    progress = (this.elapsedTime / this.maxDuration) * 100;
-                }
-
-                this.progressFill.style.width = Math.min(progress, 100) + '%';
+                const progress = mode === 'records'
+                    ? (this.currentRecord / this.maxRecords) * 100
+                    : (this.elapsedTime / this.maxDuration) * 100;
+                this.progressFill.style.width = `${Math.min(progress, 100)}%`;
             }
 
             stopRecording(reason = 'Recording stopped manually') {
                 this.isRecording = false;
-
-                if (this.recordingInterval) {
-                    clearInterval(this.recordingInterval);
-                    this.recordingInterval = null;
-                }
-
-                if (this.durationTimer) {
-                    clearInterval(this.durationTimer);
-                    this.durationTimer = null;
-                }
+                clearInterval(this.recordingInterval);
+                clearInterval(this.durationTimer);
+                this.recordingInterval = null;
+                this.durationTimer = null;
 
                 this.startBtn.disabled = false;
                 this.stopBtn.disabled = true;
-                this.exportBtn.disabled = false;
+                this.exportBtn.disabled = this.data.length === 0;
 
                 this.status.textContent = `${reason}. ${this.data.length} records collected in ${this.elapsedTime}s.`;
                 this.status.className = 'status stopped';
                 this.recordingIndicator.classList.remove('active');
-
                 this.updateStats();
             }
 
@@ -748,20 +648,14 @@
                     return;
                 }
 
-                const csvHeader = 'Time,Flow Rate (L/min),Temperature (°C)\n';
-                const csvData = this.data.map(record => 
-                    `${record.time},${record.flowRate},${record.temperature}`
-                ).join('\n');
-
-                const csvContent = csvHeader + csvData;
-                const blob = new Blob([csvContent], { type: 'text/csv' });
+                const csvHeader = 'Time,Flow Rate (L/min)\n';
+                const csvData = this.data.map(r => `${r.time},${r.flowRate}`).join('\n');
+                const blob = new Blob([csvHeader + csvData], { type: 'text/csv' });
                 const url = window.URL.createObjectURL(blob);
-
                 const a = document.createElement('a');
                 a.href = url;
-                a.download = `sensor_data_${new Date().toISOString().slice(0, 19).replace(/:/g, '-')}.csv`;
+                a.download = `flow_data_${new Date().toISOString().slice(0, 10)}.csv`;
                 a.click();
-
                 window.URL.revokeObjectURL(url);
 
                 this.status.textContent = 'Data exported successfully!';
@@ -772,147 +666,92 @@
         document.addEventListener('DOMContentLoaded', () => {
             const logger = new SensorDataLogger();
 
-            // Function to fetch sensor data
+            // --- Sensor Data Fetching ---
             function getSensorData() {
                 fetch('/data')
-                    .then(response => response.json())
-                    .then(data => {
-                        // Update the SensorDataLogger instance's temperature value and display
-                        logger.currentFlowRate = data.flow_rate;
-                        logger.updateRealtimeDisplay(data.flow_rate);
-                    })
-                    .catch(error => console.error('Error fetching sensor data:', error));
-            }
-
-            // Update sensor data every second
-            setInterval(getSensorData, 1000);
-
-            // Function to update realtime display
-            SensorDataLogger.prototype.updateRealtimeDisplay = function(flowRate) {
-                this.realtimeFlowRate.classList.add('data-change');
-                this.realtimeFlowRate.textContent = flowRate.toFixed(1);
-
-                setTimeout(() => {
-                    this.realtimeFlowRate.classList.remove('data-change');
-                }, 500);
-            }
-
-            // SD Card Management Functions
-            function listFiles() {
-                fetch('/list_files')
-                    .then(response => response.json())
-                    .then(files => {
-                        const fileList = document.getElementById('fileList');
-                        fileList.innerHTML = '';
-                        files.forEach(file => {
-                            const li = document.createElement('li');
-                            li.textContent = file;
-                            fileList.appendChild(li);
-                        });
-                    })
-                    .catch(error => console.error('Error listing files:', error));
-            }
-
-            function deleteFile(filename) {
-                fetch(`/delete_file?filename=${filename}`)
                     .then(response => {
-                        if (response.ok) {
-                            alert('File deleted successfully');
-                            listFiles(); // Refresh the file list
-                        } else {
-                            alert('Error deleting file');
+                        if (!response.ok) throw new Error('Network response was not ok');
+                        return response.json();
+                    })
+                    .then(data => {
+                        if (data.hasOwnProperty('flow_rate')) {
+                            logger.currentFlowRate = data.flow_rate;
+                            logger.updateRealtimeDisplay(data.flow_rate);
                         }
                     })
-                    .catch(error => console.error('Error deleting file:', error));
+                    .catch(error => {
+                        console.error('Error fetching sensor data:', error);
+                        logger.updateRealtimeDisplay(0); // Show 0 on error
+                        document.getElementById('realtimeFlowRate').textContent = 'Error';
+                    });
+            }
+            setInterval(getSensorData, 100); // Fetch every 2 seconds
+            getSensorData(); // Initial fetch
+
+            // --- SD Card Management Functions ---
+            const fileListElem = document.getElementById('fileList');
+            const fileNameInput = document.getElementById('fileNameInput');
+
+            function listFiles() {
+                fetch('/list_files')
+                    .then(response => {
+                        if (response.status === 503) { // Service Unavailable (SD not ready)
+                            fileListElem.innerHTML = '<li>SD Card not available.</li>';
+                            throw new Error('SD Card not available');
+                        }
+                        if (!response.ok) throw new Error('Failed to list files');
+                        return response.json();
+                    })
+                    .then(files => {
+                        fileListElem.innerHTML = '';
+                        if (files.length === 0) {
+                            fileListElem.innerHTML = '<li>No .csv files found.</li>';
+                        } else {
+                            files.forEach(file => {
+                                const li = document.createElement('li');
+                                li.textContent = file;
+                                li.onclick = () => { fileNameInput.value = file; };
+                                fileListElem.appendChild(li);
+                            });
+                        }
+                    })
+                    .catch(error => {
+                        console.error('Error listing files:', error.message);
+                        if (error.message !== 'SD Card not available') {
+                           fileListElem.innerHTML = '<li>Error loading file list.</li>';
+                        }
+                    });
             }
 
-            function downloadFile(filename) {
+            function deleteFile() {
+                const filename = fileNameInput.value;
+                if (!filename) { alert('Please select or enter a filename to delete.'); return; }
+                if (!confirm(`Are you sure you want to delete ${filename}?`)) return;
+
+                fetch(`/delete_file?filename=${filename}`)
+                    .then(response => {
+                        if (!response.ok) throw new Error('Server responded with an error.');
+                        alert('File deleted successfully');
+                        fileNameInput.value = '';
+                        listFiles();
+                    })
+                    .catch(error => {
+                        console.error('Error deleting file:', error);
+                        alert('Error deleting file. Check console for details.');
+                    });
+            }
+
+            function downloadFile() {
+                const filename = fileNameInput.value;
+                if (!filename) { alert('Please select or enter a filename to download.'); return; }
                 window.location.href = `/download_file?filename=${filename}`;
             }
 
-            // Event listeners for SD card management buttons
-            document.getElementById('deleteFileBtn').addEventListener('click', () => {
-                const filename = document.getElementById('filenameToDelete').value;
-                deleteFile(filename);
-            });
+            document.getElementById('deleteFileBtn').addEventListener('click', deleteFile);
+            document.getElementById('downloadFileBtn').addEventListener('click', downloadFile);
 
-            document.getElementById('downloadFileBtn').addEventListener('click', () => {
-                const filename = document.getElementById('filenameToDownload').value;
-                downloadFile(filename);
-            });
-
-            // Initial file list and sensor data update
             listFiles();
         });
-
-        // Function to modify sketch_aug6b.ino
-        function modifySketch() {
-            const newContent = document.getElementById('sketchContent').value;
-            fetch('/write_file?filename=sketch_aug6b.ino', {
-                method: 'POST',
-                body: newContent,
-            })
-            .then(response => {
-                if (response.ok) {
-                    alert('sketch_aug6b.ino modified successfully');
-                } else {
-                    alert('Error modifying sketch_aug6b.ino');
-                }
-            })
-            .catch(error => console.error('Error modifying sketch_aug6b.ino:', error));
-        }
-
-        // Add event listener to the modify button
-        document.getElementById('modifySketchBtn').addEventListener('click', modifySketch);
     </script>
-
-    <h2>Modify sketch_aug6b.ino</h2>
-    <textarea id="sketchContent" rows="10" cols="80"></textarea>
-    <button id="modifySketchBtn"  class="btn btn-primary">Modify Sketch</button>
-
-    <style>
-        .sd-card-section {
-            padding: 20px;
-            background: #f8f9fa;
-            border-bottom: 1px solid #e0e0e0;
-        }
-
-        .sd-card-section h2 {
-            font-size: 1.5em;
-            color: #333;
-            margin-bottom: 15px;
-            text-align: center;
-        }
-
-        .sd-card-section ul {
-            list-style: none;
-            padding: 0;
-        }
-
-        .sd-card-section li {
-            padding: 8px 12px;
-            border-bottom: 1px solid #ddd;
-        }
-
-        .sd-card-section input[type="text"] {
-            padding: 10px;
-            margin-right: 10px;
-            border: 1px solid #ddd;
-            border-radius: 5px;
-        }
-
-        .btn-primary {
-            background-color: #007bff;
-            color: white;
-            padding: 10px 15px;
-            border: none;
-            border-radius: 5px;
-            cursor: pointer;
-        }
-
-        .btn-primary:hover {
-            background-color: #0056b3;
-        }
-    </style>
 </body>
 </html>

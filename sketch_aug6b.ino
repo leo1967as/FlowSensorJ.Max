@@ -11,7 +11,7 @@
 #define TX_PIN 17
 
 #define SLAVE_ID 3
-#define REG_ADDRESS 1
+#define REG_ADDRESS 20
 #define REG_COUNT 1
 
 ModbusMaster node;
@@ -22,7 +22,7 @@ void postTransmission();
 
 void setup() {
   Serial.begin(115200);
-  Serial2.begin(9600, SERIAL_8N1, RX_PIN, TX_PIN);
+  Serial2.begin(19200, SERIAL_8N1, RX_PIN, TX_PIN);
   pinMode(DE_RE_CTRL_PIN, OUTPUT);
   digitalWrite(DE_RE_CTRL_PIN, LOW);
   node.preTransmission(preTransmission);
@@ -36,10 +36,9 @@ void setup() {
   }
 
   // SD Card Initialization
-  const int chipSelect = 5;
+  const int chipSelect = 15;
   if (!SD.begin(chipSelect)) {
     Serial.println("SD Card Mount Failed");
-    return;
   }
   Serial.println("SD Card Ready");
 
