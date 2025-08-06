@@ -230,6 +230,8 @@
                 "C:\\Users\\LEO\\AppData\\Local\\Arduino15\\packages\\esp32\\hardware\\esp32\\2.0.17\\libraries\\SPIFFS\\src",
                 "C:\\Users\\LEO\\AppData\\Local\\Arduino15\\packages\\esp32\\hardware\\esp32\\2.0.17\\libraries\\WiFi\\src",
                 "C:\\Users\\LEO\\AppData\\Local\\Arduino15\\packages\\esp32\\hardware\\esp32\\2.0.17\\libraries\\WebServer\\src",
+                "C:\\Users\\LEO\\Documents\\Arduino\\libraries\\WebSockets\\src",
+                "C:\\Users\\LEO\\AppData\\Local\\Arduino15\\packages\\esp32\\hardware\\esp32\\2.0.17\\libraries\\WiFiClientSecure\\src",
                 "C:\\Users\\LEO\\Documents\\Arduino\\libraries\\ArduinoJson\\src",
                 "c:\\users\\leo\\appdata\\local\\arduino15\\packages\\esp32\\tools\\xtensa-esp32-elf-gcc\\esp-2021r2-patch5-8.4.0\\xtensa-esp32-elf\\include\\c++\\8.4.0",
                 "c:\\users\\leo\\appdata\\local\\arduino15\\packages\\esp32\\tools\\xtensa-esp32-elf-gcc\\esp-2021r2-patch5-8.4.0\\xtensa-esp32-elf\\include\\c++\\8.4.0\\xtensa-esp32-elf",
