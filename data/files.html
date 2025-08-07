@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>File Management</title>
+    <style>
+        /* (ใช้ CSS สไตล์เดียวกันกับ main.html เพื่อความสอดคล้อง) */
+        body { font-family: 'Segoe UI', sans-serif; background: #f0f2f5; display: flex; justify-content: center; align-items: center; min-height: 100vh; padding: 20px; }
+        .container { max-width: 800px; width: 100%; background: white; border-radius: 12px; box-shadow: 0 10px 30px rgba(0,0,0,0.1); overflow: hidden; }
+        .header { background: linear-gradient(135deg, #6c757d, #343a40); color: white; padding: 25px; text-align: center; }
+        .header h1 { margin: 0; font-size: 2em; }
+        .content { padding: 30px; }
+        #fileListContainer { max-height: 300px; overflow-y: auto; border: 1px solid #ddd; border-radius: 8px; margin-bottom: 20px; }
+        #fileList { list-style: none; padding: 0; margin: 0; }
+        #fileList li { padding: 12px 15px; border-bottom: 1px solid #eee; cursor: pointer; transition: background-color 0.2s; }
+        #fileList li:hover { background-color: #f0f0f0; }
+        #fileList li:last-child { border-bottom: none; }
+        .sd-controls { display: grid; grid-template-columns: 1fr auto auto auto; gap: 10px; align-items: center; }
+        .sd-controls input { padding: 10px; border: 1px solid #ccc; border-radius: 5px; font-size: 1em; }
+        .btn-sd { padding: 10px 15px; border: none; border-radius: 5px; cursor: pointer; color: white; font-weight: bold; transition: background-color 0.3s; }
+        .btn-download { background-color: #007bff; }
+        .btn-delete { background-color: #dc3545; }
+        .btn-refresh { background-color: #17a2b8; }
+        .status { text-align: center; padding: 12px; border-radius: 8px; margin-bottom: 20px; font-weight: 500; background: #e2e3e5; color: #383d41; }
+        .nav-link { display: block; text-align: center; margin-top: 20px; padding: 10px; background: #5664d2; color: white; text-decoration: none; border-radius: 8px; transition: background 0.3s; }
+        .nav-link:hover { background: #2a368e; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🗂️ SD Card File Management</h1>
+        </div>
+        <div class="content">
+            <div class="status" id="status">Loading file list...</div>
+            <div id="fileListContainer">
+                <ul id="fileList"></ul>
+            </div>
+            <div class="sd-controls">
+                <input type="text" id="fileNameInput" placeholder="Click a file to select...">
+                <button id="downloadFileBtn" class="btn-sd btn-download">Download</button>
+                <button id="deleteFileBtn" class="btn-sd btn-delete">Delete</button>
+                <button id="refreshListBtn" class="btn-sd btn-refresh">Refresh</button>
+            </div>
+            <a href="/" class="nav-link">⬅️ Back to Control Page</a>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const statusElem = document.getElementById('status');
+            const fileListElem = document.getElementById('fileList');
+            const fileNameInput = document.getElementById('fileNameInput');
+            const downloadBtn = document.getElementById('downloadFileBtn');
+            const deleteBtn = document.getElementById('deleteFileBtn');
+            const refreshBtn = document.getElementById('refreshListBtn');
+
+            function listFiles() {
+                statusElem.textContent = "Refreshing file list...";
+                fileListElem.innerHTML = '';
+                fetch('/list_files')
+                    .then(response => {
+                        if (!response.ok) throw new Error(`Server error: ${response.statusText}`);
+                        return response.json();
+                    })
+                    .then(files => {
+                        if (files.length === 0) {
+                            fileListElem.innerHTML = '<li>No .csv files found.</li>';
+                        } else {
+                            files.forEach(file => {
+                                const li = document.createElement('li');
+                                li.textContent = file.substring(1); // Remove leading '/'
+                                li.onclick = () => { fileNameInput.value = file; };
+                                fileListElem.appendChild(li);
+                            });
+                        }
+                        statusElem.textContent = "File list updated.";
+                    })
+                    .catch(error => {
+                        statusElem.textContent = `Error: ${error.message}`;
+                        console.error('Error listing files:', error);
+                    });
+            }
+
+            function deleteFile() {
+                const filename = fileNameInput.value;
+                if (!filename) { alert('Please select a file to delete.'); return; }
+                if (!confirm(`Are you sure you want to delete ${filename.substring(1)}?`)) return;
+                
+                fetch(`/delete_file?filename=${filename}`)
+                    .then(response => {
+                        if (!response.ok) throw new Error('Delete command failed.');
+                        alert('File deleted successfully.');
+                        fileNameInput.value = '';
+                        listFiles();
+                    })
+                    .catch(error => alert(`Error: ${error.message}`));
+            }
+
+            function downloadFile() {
+                const filename = fileNameInput.value;
+                if (!filename) { alert('Please select a file to download.'); return; }
+                window.location.href = `/download_file?filename=${filename}`;
+            }
+
+            downloadBtn.addEventListener('click', downloadFile);
+            deleteBtn.addEventListener('click', deleteFile);
+            refreshBtn.addEventListener('click', listFiles);
+
+            listFiles(); // Initial load
+        });
+    </script>
+</body>
+</html>
